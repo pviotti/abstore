@@ -1,22 +1,23 @@
-package ckite.kvstore
+package fr.eurecom.kvstore.smr.raft
 
-import java.util.concurrent.ConcurrentHashMap
 import java.nio.ByteBuffer
+import java.util.concurrent.ConcurrentHashMap
+
 import ckite.statemachine.StateMachine
-import ckite.util.Serializer
-import ckite.util.Logging
+import ckite.util.{Logging, Serializer}
 
 
 class KVStore extends StateMachine with Logging {
 
   val map = new ConcurrentHashMap[String, String]()
+
   @volatile
   var lastIndex: Long = 0
 
   def applyWrite = {
     case (index, Put(key: String, value: String)) => {
       LOG.debug(s"Put $key=$value")
-      map.put(key, value);
+      map.put(key, value)
       lastIndex = index
       value
     }
