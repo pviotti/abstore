@@ -6,21 +6,20 @@ import com.twitter.finagle.http.Request
 import com.twitter.finagle.http.Http
 import java.net.InetSocketAddress
 import com.twitter.util.Closable
-import ckite.Raft
-import com.typesafe.config.ConfigFactory
+import fr.eurecom.kvstore.smr.KVStore
 
-class HttpServer(raft: Raft) {
+class HttpServer(kvs: KVStore, address: String) {
   
   var closed = false
   var server: Closable = _
   
   def start() = {
-    val restServerPort = ConfigFactory.load().getString("ckite.listen-address").split(":")(1).toInt + 1000
+    val restServerPort = address.split(":")(1).toInt + 1000
      server = ServerBuilder()
       .codec(RichHttp[Request](Http()))
       .bindTo(new InetSocketAddress(restServerPort))
       .name("HttpServer")
-      .build(new HttpService(raft))
+      .build(new HttpService(kvs))
   }
   
   def stop() = synchronized {
@@ -33,5 +32,5 @@ class HttpServer(raft: Raft) {
 }
 
 object HttpServer {
-  def apply(raft: Raft) = new HttpServer(raft)
+  def apply(kvs: KVStore, address: String) = new HttpServer(kvs, address)
 }

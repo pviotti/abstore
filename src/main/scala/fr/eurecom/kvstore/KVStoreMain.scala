@@ -1,12 +1,16 @@
 package fr.eurecom.kvstore
 
+import java.io.File
+
 import ckite.RaftBuilder
 import fr.eurecom.kvstore.http.HttpServer
-import fr.eurecom.kvstore.smr.raft.KVStore
+import fr.eurecom.kvstore.smr.KVStore
+import fr.eurecom.kvstore.smr.raft.RaftKVStore
+import fr.eurecom.kvstore.smr.zab.ZabKVStore
 import scopt.OptionParser
 
-case class Config(smr: String = "raft", dataDir: String = "/tmp/kvstore", address: String = "localhost:9091",
-                  bootstrap: Boolean = false, members: String = "")
+case class Config(smr: String = "raft", dataDir: String = "/tmp/kvstore",
+                  address: String = "localhost:9091", bootstrap: Boolean = false, members: String = "")
 
 /**
  * KVStore main class.
@@ -34,19 +38,43 @@ object KVStoreMain extends App {
 
   parser.parse(args.toSeq, Config()) map { config =>
 
-    val raft = RaftBuilder().listenAddress(config.address)
-      .members(config.members.split(",")) //optional seeds to join the cluster
-      .bootstrap(config.bootstrap)
-      .dataDir(config.dataDir) //dataDir for persistent state (log, terms, snapshots, etc...)
-      .stateMachine(new KVStore()) //KVStore is an implementation of the StateMachine trait
-      .sync(false) //disables log sync to disk
-      .build
+    this.removeDirectory(config.dataDir)
 
-    raft.start
-    val http = HttpServer(raft)
+    var kvs : KVStore = null
+
+    config.smr match {
+      case "zab" =>
+        kvs = new ZabKVStore(config.address, config.dataDir, config.members, config.bootstrap)
+      case "raft" =>
+        kvs = new RaftKVStore()
+        val raft = RaftBuilder().listenAddress(config.address)
+          .members(config.members.split(",")) //optional seeds to join the cluster
+          .bootstrap(config.bootstrap)
+          .dataDir(config.dataDir) //dataDir for persistent state (log, terms, snapshots, etc...)
+          .stateMachine(kvs.asInstanceOf[RaftKVStore]) //KVStore is an implementation of the StateMachine trait
+          .sync(false) //disables log sync to disk
+          .build
+        kvs.asInstanceOf[RaftKVStore].setRaft(raft)
+    }
+
+    kvs.init()
+    val http = HttpServer(kvs, config.address)
     http.start
 
   } getOrElse { // arguments are bad, usage message will have been displayed
     sys.exit(-1)
+  }
+
+  def removeDirectory(path: String) = {
+    def getRecursively(f: File): Seq[File] =
+      f.listFiles.filter(_.isDirectory).flatMap(getRecursively) ++ f.listFiles
+
+    if (new File(path).exists()) {
+      getRecursively(new File(path)).foreach { f =>
+        if (!f.delete())
+          throw new RuntimeException("Failed to delete " + f.getAbsolutePath)
+      }
+      new File(path).delete()
+    }
   }
 }
