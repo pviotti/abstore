@@ -1,4 +1,4 @@
-package fr.eurecom.kvstore.smr.zab
+package fr.eurecom.abstore.kvs.zab
 
 import java.io._
 import java.nio.ByteBuffer
@@ -9,11 +9,9 @@ import com.github.zk1931.jzab._
 
 import ckite.util.Logging  //FIXME
 
-import fr.eurecom.kvstore.smr.KVStore
+import fr.eurecom.abstore.kvs.KVStore
 
-/**
- * Created by paolo on 11/12/14.
- */
+
 case class ZabKVStore(address: String, dataDir: String, members: String, bootstrap: Boolean)
   extends StateMachine with Logging with KVStore {
 

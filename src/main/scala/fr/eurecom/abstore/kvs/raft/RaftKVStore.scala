@@ -1,4 +1,4 @@
-package fr.eurecom.kvstore.smr.raft
+package fr.eurecom.abstore.kvs.raft
 
 import java.nio.ByteBuffer
 import java.util.concurrent.ConcurrentHashMap
@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap
 import ckite.Raft
 import ckite.statemachine.StateMachine
 import ckite.util.{Logging, Serializer}
-import fr.eurecom.kvstore.smr.KVStore
+import fr.eurecom.abstore.kvs.KVStore
 
 
 class RaftKVStore extends StateMachine with Logging with KVStore {
@@ -17,7 +17,7 @@ class RaftKVStore extends StateMachine with Logging with KVStore {
 
   def setRaft(r: Raft): Unit = { raft = r }
 
-  override def init(): Unit = { raft start }
+  override def init(): Unit = { raft.start }
 
   override def get(key: String): String = { raft.readLocal(new Get(key)) }
 

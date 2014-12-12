@@ -1,4 +1,4 @@
-package fr.eurecom.kvstore.smr.raft
+package fr.eurecom.abstore.kvs.raft
 
 import ckite.rpc.ReadCommand
 

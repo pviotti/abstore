@@ -1,8 +1,6 @@
-package fr.eurecom.kvstore.smr.zab
+package fr.eurecom.abstore.kvs.zab
 
-/**
- * Created by paolo on 11/12/14.
- */
+
 abstract class Command extends Serializable {
   private val serialVersionUID: Long = 0L
   def execute(db: ZabKVStore)

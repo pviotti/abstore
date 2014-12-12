@@ -1,4 +1,4 @@
-package fr.eurecom.kvstore.http
+package fr.eurecom.abstore.http
 
 import com.twitter.finagle.builder.ServerBuilder
 import com.twitter.finagle.http.RichHttp
@@ -6,7 +6,7 @@ import com.twitter.finagle.http.Request
 import com.twitter.finagle.http.Http
 import java.net.InetSocketAddress
 import com.twitter.util.Closable
-import fr.eurecom.kvstore.smr.KVStore
+import fr.eurecom.abstore.kvs.KVStore
 
 class HttpServer(kvs: KVStore, address: String) {
   

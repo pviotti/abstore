@@ -1,26 +1,26 @@
-package fr.eurecom.kvstore
+package fr.eurecom.abstore
 
 import java.io.File
 
 import ckite.RaftBuilder
-import fr.eurecom.kvstore.http.HttpServer
-import fr.eurecom.kvstore.smr.KVStore
-import fr.eurecom.kvstore.smr.raft.RaftKVStore
-import fr.eurecom.kvstore.smr.zab.ZabKVStore
+import fr.eurecom.abstore.http.HttpServer
+import fr.eurecom.abstore.kvs.KVStore
+import fr.eurecom.abstore.kvs.raft.RaftKVStore
+import fr.eurecom.abstore.kvs.zab.ZabKVStore
 import scopt.OptionParser
 
-case class Config(smr: String = "raft", dataDir: String = "/tmp/kvstore",
+case class Config(smr: String = "raft", dataDir: String = "/tmp/kvs/n1",
                   address: String = "localhost:9091", bootstrap: Boolean = false, members: String = "")
 
 /**
- * KVStore main class.
- * To launch it from command line, using sbt:
- * $ sbt "run -r raft -a localhost:9091 -d /tmp/kvstore -bootstrap"
+ * AbStore main class.
+ * To launch it from command line using sbt:
+ * $ sbt "run -r raft -a localhost:9091 -d /tmp/kvs/n1 -bootstrap"
  */
-object KVStoreMain extends App {
+object AbStoreMain extends App {
 
-  val parser = new OptionParser[Config]("kvstore") {
-    head("kvstore", "0.1.0")
+  val parser = new OptionParser[Config]("abstore") {
+    head("abstore", "0.1.0")
     opt[String]('r', "smr") required() action { (x, c) =>
       c.copy(smr = x) } text("SMR protocol (raft, zab)")
     opt[String]('d', "dataDir") required() action { (x, c) =>
@@ -48,11 +48,11 @@ object KVStoreMain extends App {
       case "raft" =>
         kvs = new RaftKVStore()
         val raft = RaftBuilder().listenAddress(config.address)
-          .members(config.members.split(",")) //optional seeds to join the cluster
+          .members(config.members.split(",")) // optional seeds to join the cluster
           .bootstrap(config.bootstrap)
-          .dataDir(config.dataDir) //dataDir for persistent state (log, terms, snapshots, etc...)
-          .stateMachine(kvs.asInstanceOf[RaftKVStore]) //KVStore is an implementation of the StateMachine trait
-          .sync(false) //disables log sync to disk
+          .dataDir(config.dataDir) // dataDir for persistent state (log, terms, snapshots, etc...)
+          .stateMachine(kvs.asInstanceOf[RaftKVStore]) // KVStore is an implementation of the StateMachine trait
+          .sync(false) // disables log sync to disk
           .build
         kvs.asInstanceOf[RaftKVStore].setRaft(raft)
     }

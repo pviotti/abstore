@@ -1,6 +1,6 @@
-package fr.eurecom.kvstore.http
+package fr.eurecom.abstore.http
 
-import fr.eurecom.kvstore.smr.KVStore
+import fr.eurecom.abstore.kvs.KVStore
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future => ScalaFuture}
@@ -29,7 +29,7 @@ class HttpService(kvs: KVStore) extends Service[Request, Response] {
   def apply(request: Request) = request.method -> Path(request.path) match {
     case Method.Get -> Root => Future.value {
       val response = Response()
-      response.contentString = writer.writeValueAsString("NOT IMPLEMENTED") // FIXME
+      response.contentString = writer.writeValueAsString("TO DO") // FIXME
       response
     }
     case Method.Get -> Root / "kv" / key => {

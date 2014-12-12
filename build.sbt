@@ -1,4 +1,4 @@
-name := "kvstore"
+name := "abstore"
 
 organization := "fr.eurecom"
 
