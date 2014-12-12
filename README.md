@@ -1,8 +1,8 @@
 # AbStore
 
-AbStore is a simple in-memory key-value store that can be used to experiment with different atomic broadcast protocols.  
+AbStore is a simple in-memory key-value store that can be used to experiment with different **a**tomic **b**roadcast protocols.  
 
-Currently it supports [Zab][1] and [Raft][2], through their implementation: [jZab][3] and [CKite][4].
+Currently it supports [Zab][1] and [Raft][2], through their JVM implementation: [jZab][3] and [CKite][4].
 
 [1]: http://web.stanford.edu/class/cs347/reading/zab.pdf
 [2]: http://raftconsensus.github.io/
@@ -27,7 +27,7 @@ Usage: abstore [options]
         Members addresses
 ```
 
-To start a local cluster of 3 nodes launch the following commands in different shells:
+To start a local cluster of 3 nodes use the following commands in different shells:
 
 ```bash
 sbt "run -r zab -d /tmp/kvs/m1 -a localhost:9091 --bootstrap"
@@ -54,3 +54,7 @@ TODO
 
  * Written in Scala, using sbt as building system
  * Keeps data only in memory (in a ``ConcurrentHashMap``)
+
+## License
+
+Apache 2.0
